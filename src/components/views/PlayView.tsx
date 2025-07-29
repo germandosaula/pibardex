@@ -4,10 +4,12 @@ import Carousel from '../Carousel'
 import BoxedCards from '../BoxedCards'
 import MemoryGame from '../games/MemoryGame'
 import SpinWheel from '../SpinWheel'
+import { useUser } from '../../contexts/UserContext'
 import type { CardItem } from '../BoxedCards'
 
 export default function PlayView() {
   const [currentView, setCurrentView] = useState<'main' | 'memory-game' | 'spin-wheel'>('main')
+  const { addCoins, addExperience } = useUser()
 
   // Datos de juegos para el componente reutilizable
   const gamesData: CardItem[] = [
@@ -100,9 +102,22 @@ export default function PlayView() {
     setCurrentView('main');
   };
 
-  const handleCoinsWon = (coins: number) => {
+  const handleCoinsWon = async (coins: number) => {
     console.log(`¡Ganaste ${coins} PiCoins!`);
-    // Aquí puedes agregar la lógica para actualizar el balance de monedas del usuario
+    try {
+      await addCoins(coins);
+    } catch (error) {
+      console.error('Error al agregar monedas:', error);
+    }
+  };
+
+  const handleExperienceGained = async (experience: number) => {
+    console.log(`¡Ganaste ${experience} XP!`);
+    try {
+      await addExperience(experience);
+    } catch (error) {
+      console.error('Error al agregar experiencia:', error);
+    }
   };
 
   // Renderizar vista según el estado actual
@@ -137,7 +152,7 @@ export default function PlayView() {
           </svg>
           Volver
         </button>
-        <SpinWheel onCoinsWon={handleCoinsWon} />
+        <SpinWheel onCoinsWon={handleCoinsWon} onExperienceGained={handleExperienceGained} />
       </div>
     );
   }

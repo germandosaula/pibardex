@@ -1,7 +1,10 @@
 import BoxedCards from '../BoxedCards'
 import type { CardItem } from '../BoxedCards'
+import { useUser } from '../../contexts/UserContext'
 
 export default function StoreView() {
+  const { state: { user, isAuthenticated } } = useUser();
+  
   // Datos de sobres para el componente reutilizable
   const cardPacksData: CardItem[] = [
     {
@@ -62,8 +65,10 @@ export default function StoreView() {
           <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-3 border border-yellow-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-yellow-300 text-xs">Monedas de Oro</p>
-                <p className="text-lg sm:text-xl font-bold text-white">1,247</p>
+                <p className="text-yellow-300 text-xs">PiCoins</p>
+                <p className="text-lg sm:text-xl font-bold text-white">
+                  {isAuthenticated && user ? user.coins.toLocaleString() : '---'}
+                </p>
               </div>
               <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
@@ -77,8 +82,10 @@ export default function StoreView() {
           <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-sm rounded-xl p-3 border border-purple-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-300 text-xs">Gemas</p>
-                <p className="text-lg sm:text-xl font-bold text-white">89</p>
+                <p className="text-purple-300 text-xs">Experiencia</p>
+                <p className="text-lg sm:text-xl font-bold text-white">
+                  {isAuthenticated && user ? user.experience.toLocaleString() : '---'}
+                </p>
               </div>
               <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
@@ -91,8 +98,10 @@ export default function StoreView() {
           <div className="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm rounded-xl p-3 border border-blue-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-300 text-xs">Tokens</p>
-                <p className="text-lg sm:text-xl font-bold text-white">156</p>
+                <p className="text-blue-300 text-xs">Nivel</p>
+                <p className="text-lg sm:text-xl font-bold text-white">
+                  {isAuthenticated && user ? user.level : '---'}
+                </p>
               </div>
               <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">

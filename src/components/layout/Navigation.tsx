@@ -3,14 +3,11 @@ import { motion } from 'framer-motion';
 import { Home, Gamepad2, Trophy, Package, User, Sparkles } from 'lucide-react';
 import { CoinDisplay } from '../ui/CoinDisplay';
 import { ExperienceBar } from '../ui/ExperienceBar';
+import { useUser } from '../../contexts/UserContext';
 
-interface NavigationProps {
-  coins: number;
-  experience: number;
-  level: number;
-}
-
-export const Navigation: React.FC<NavigationProps> = ({ coins, experience, level }) => {
+export const Navigation: React.FC = () => {
+  const { state } = useUser();
+  const { user, coins, experience, level, isAuthenticated } = state;
   const navItems = [
     { icon: Home, label: 'Inicio', color: 'from-blue-400 to-blue-600' },
     { icon: Gamepad2, label: 'Juegos', color: 'from-purple-400 to-purple-600' },
@@ -31,16 +28,13 @@ export const Navigation: React.FC<NavigationProps> = ({ coins, experience, level
           {/* Logo */}
           <motion.div
             className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
           >
-            <motion.div
-              className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg"
-              whileHover={{ rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400 }}
-            >
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
               <Sparkles className="text-white" size={24} />
-            </motion.div>
+            </div>
             <div>
               <h1 className="text-2xl font-bold gradient-text">Pibardex</h1>
               <p className="text-xs text-white/60 font-medium">Trading Cards</p>
@@ -70,62 +64,68 @@ export const Navigation: React.FC<NavigationProps> = ({ coins, experience, level
                     {item.label}
                   </span>
                 </div>
-                
-                {/* Hover effect */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  layoutId="navHover"
-                />
               </motion.button>
             ))}
           </div>
 
-          {/* User Stats */}
-          <motion.div
-            className="flex items-center space-x-4"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-          >
-            {/* Coins */}
+          {/* User Stats - Solo mostrar si está autenticado */}
+          {isAuthenticated && (
             <motion.div
-              className="glass-effect-dark rounded-xl px-4 py-2 flex items-center space-x-2"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              className="hidden lg:flex items-center space-x-4"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
             >
-              <CoinDisplay coins={coins} />
-            </motion.div>
+              {/* Coins */}
+              <motion.div
+                className="glass-effect-dark rounded-xl px-4 py-2 flex items-center space-x-2"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <CoinDisplay coins={coins} />
+              </motion.div>
 
-            {/* Level & Experience */}
+              {/* Level & Experience */}
+              <motion.div
+                className="glass-effect-dark rounded-xl px-4 py-2 min-w-[120px]"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-white/80 text-sm font-medium">Nivel</span>
+                  <span className="text-yellow-400 font-bold text-lg">{level}</span>
+                </div>
+                <ExperienceBar 
+                  currentExp={experience} 
+                  level={level}
+                  maxExp={level * 100}
+                />
+              </motion.div>
+
+              {/* User Avatar */}
+              <motion.button
+                className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <User className="text-white" size={20} />
+              </motion.button>
+            </motion.div>
+          )}
+
+          {/* Guest message - Solo mostrar si no está autenticado */}
+          {!isAuthenticated && (
             <motion.div
-              className="glass-effect-dark rounded-xl px-4 py-2 min-w-[120px]"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              className="hidden lg:flex items-center"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-white/80 text-sm font-medium">Nivel</span>
-                <motion.span
-                  className="text-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"
-                  key={level}
-                  initial={{ scale: 1.2 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  {level}
-                </motion.span>
+              <div className="text-white/60 text-sm">
+                Inicia sesión para ver tus estadísticas
               </div>
-              <ExperienceBar currentExp={experience} level={level} />
             </motion.div>
-
-            {/* Profile Avatar */}
-            <motion.button
-              className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <User className="text-white" size={20} />
-            </motion.button>
-          </motion.div>
+          )}
         </div>
       </div>
 
@@ -140,7 +140,7 @@ export const Navigation: React.FC<NavigationProps> = ({ coins, experience, level
           {navItems.slice(0, 4).map((item, index) => (
             <motion.button
               key={item.label}
-              className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all duration-300 hover:bg-white/10"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, y: 20 }}

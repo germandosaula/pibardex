@@ -13,9 +13,10 @@ interface Prize {
 
 interface SpinWheelProps {
   onCoinsWon?: (coins: number) => void
+  onExperienceGained?: (experience: number) => void
 }
 
-export default function SpinWheel({ onCoinsWon }: SpinWheelProps) {
+export default function SpinWheel({ onCoinsWon, onExperienceGained }: SpinWheelProps) {
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [canSpin, setCanSpin] = useState(true)
@@ -180,9 +181,14 @@ export default function SpinWheel({ onCoinsWon }: SpinWheelProps) {
       setShowResult(true)
       setIsSpinning(false)
       
-      // Callback para actualizar monedas
+      // Callback para actualizar monedas y experiencia
       if (onCoinsWon) {
         onCoinsWon(wonPrize.coins)
+      }
+      
+      // Otorgar 100 XP por cada spin
+      if (onExperienceGained) {
+        onExperienceGained(100)
       }
 
       // Guardar la fecha del último spin (desactivado para pruebas)
@@ -369,10 +375,19 @@ export default function SpinWheel({ onCoinsWon }: SpinWheelProps) {
               <div className="text-6xl mb-4">🎉</div>
               <h2 className="text-3xl font-bold text-white mb-2">¡Felicidades!</h2>
               <p className="text-white/90 mb-4">Has ganado:</p>
-              <div className="flex items-center justify-center gap-2 mb-6">
+              
+              {/* Monedas ganadas */}
+              <div className="flex items-center justify-center gap-2 mb-4">
                 <Coins className="text-white" size={32} />
                 <span className="text-4xl font-bold text-white">{wonCoins}</span>
                 <span className="text-xl text-white/90">PiCoins</span>
+              </div>
+              
+              {/* Experiencia ganada */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <Sparkles className="text-white" size={24} />
+                <span className="text-2xl font-bold text-white">+100</span>
+                <span className="text-lg text-white/90">XP</span>
               </div>
               <button
                 onClick={closeResult}

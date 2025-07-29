@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, Trophy, Clock, Star, Volume2, VolumeX } from 'lucide-react';
+import { RotateCcw, Trophy, Clock, Star, Volume2, VolumeX, Coins } from 'lucide-react';
+import { useUser } from '../../contexts/UserContext';
 
 // Tipos para el juego
 interface GameCard {
@@ -21,6 +22,8 @@ interface GameStats {
 }
 
 const MemoryGame: React.FC = () => {
+  const { addCoins, addExperience, user } = useUser();
+  
   const [cards, setCards] = useState<GameCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<string[]>([]);
   const [gameStats, setGameStats] = useState<GameStats>({
@@ -216,11 +219,34 @@ const MemoryGame: React.FC = () => {
   // Verificar si el juego está completo
   useEffect(() => {
     const totalPairs = difficultyConfig[difficulty].pairs;
-    if (gameStats.matches === totalPairs && gameStarted) {
+    if (gameStats.matches === totalPairs && gameStarted && !gameCompleted) {
       setGameCompleted(true);
       playSound('win');
+      
+      // Otorgar recompensas al usuario si está autenticado
+      if (user) {
+        // Recompensas según dificultad
+        const rewards = {
+          easy: { coins: 100, experience: 50 },
+          medium: { coins: 200, experience: 125 },
+          hard: { coins: 300, experience: 200 }
+        };
+        
+        const reward = rewards[difficulty];
+        
+        console.log(`🎮 Juego completado - Dificultad: ${difficulty}`);
+        console.log(`💰 Otorgando ${reward.coins} monedas`);
+        console.log(`⭐ Otorgando ${reward.experience} XP`);
+        console.log(`👤 Usuario: ${user.username}`);
+        
+        // Añadir monedas y experiencia
+        addCoins(reward.coins);
+        addExperience(reward.experience);
+      } else {
+        console.log('❌ No hay usuario autenticado - no se otorgan recompensas');
+      }
     }
-  }, [gameStats.matches, difficulty, gameStarted, playSound]);
+  }, [gameStats.matches, gameStarted, gameCompleted, difficulty, user, addCoins, addExperience]);
 
   // Inicializar al montar el componente
   useEffect(() => {
@@ -432,6 +458,33 @@ const MemoryGame: React.FC = () => {
                     Has completado el Memory Game de Pibardex
                   </p>
                   
+                  {/* Recompensas obtenidas */}
+                  {user && (
+                    <div className="bg-black/30 rounded-lg p-4 mb-6">
+                      <h3 className="text-lg font-bold text-white mb-3">¡Recompensas obtenidas!</h3>
+                      <div className="flex justify-center gap-6">
+                        <div className="text-center">
+                          <div className="flex items-center justify-center gap-1 mb-1">
+                            <Coins className="text-yellow-400" size={20} />
+                            <span className="text-xl font-bold text-white">
+                              {difficulty === 'easy' ? '100' : difficulty === 'medium' ? '200' : '300'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-300">PiCoins</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center justify-center gap-1 mb-1">
+                            <Star className="text-purple-400" size={20} />
+                            <span className="text-xl font-bold text-white">
+                              {difficulty === 'easy' ? '50' : difficulty === 'medium' ? '125' : '200'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-300">XP</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="space-y-2 mb-6">
                     <p className="text-white">
                       <span className="text-gray-300">Tiempo:</span> {formatTime(gameStats.timeElapsed)}
@@ -440,7 +493,7 @@ const MemoryGame: React.FC = () => {
                       <span className="text-gray-300">Movimientos:</span> {gameStats.moves}
                     </p>
                     <p className="text-white">
-                      <span className="text-gray-300">Puntuación:</span> {gameStats.score}
+                      <span className="text-gray-300">Dificultad:</span> {difficulty === 'easy' ? 'Fácil' : difficulty === 'medium' ? 'Medio' : 'Difícil'}
                     </p>
                   </div>
                   
