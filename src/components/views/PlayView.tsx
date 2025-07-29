@@ -25,7 +25,7 @@ export default function PlayView() {
       id: "SPIN001",
       name: "PiRuleta de la fortuna",
       description: "No se come pero puedes ganar PiCoins gratis una vez al día",
-      image: "/Hero.png",
+      image: "/PiRuleta.png",
       rarity: "Gratis",
       category: "Suerte",
       players: "1",
