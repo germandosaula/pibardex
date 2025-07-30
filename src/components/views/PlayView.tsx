@@ -4,11 +4,12 @@ import Carousel from '../Carousel'
 import BoxedCards from '../BoxedCards'
 import MemoryGame from '../games/MemoryGame'
 import SpinWheel from '../SpinWheel'
+import PiFlyGame from '../games/PiFly/PiFlyGame'
 import { useUser } from '../../contexts/UserContext'
 import type { CardItem } from '../BoxedCards'
 
 export default function PlayView() {
-  const [currentView, setCurrentView] = useState<'main' | 'memory-game' | 'spin-wheel'>('main')
+  const [currentView, setCurrentView] = useState<'main' | 'memory-game' | 'spin-wheel' | 'pifly-game'>('main')
   const { addCoins, addExperience } = useUser()
 
   // Datos de juegos para el componente reutilizable
@@ -32,6 +33,16 @@ export default function PlayView() {
       category: "Suerte",
       players: "1",
       duration: "1 Segundin"
+    },
+    {
+      id: "PIFLY001",
+      name: "PiFly",
+      description: "Vuela con tus cartas favoritas y evita obstáculos para ganar PiCoins",
+      image: "/Pifly.png",
+      rarity: "Medio",
+      category: "Arcade",
+      players: "1",
+      duration: "2-10 min"
     },
     {
       id: "GAME001",
@@ -85,6 +96,9 @@ export default function PlayView() {
         break;
       case 'SPIN001':
         setCurrentView('spin-wheel');
+        break;
+      case 'PIFLY001':
+        setCurrentView('pifly-game');
         break;
       default:
         console.log('Juego no implementado aún:', game.name);
@@ -153,6 +167,24 @@ export default function PlayView() {
           Volver
         </button>
         <SpinWheel onCoinsWon={handleCoinsWon} onExperienceGained={handleExperienceGained} />
+      </div>
+    );
+  }
+
+  if (currentView === 'pifly-game') {
+    return (
+      <div className="w-full h-full relative">
+        {/* Botón de regreso */}
+        <button
+          onClick={handleBackToMain}
+          className="absolute top-4 left-4 z-50 bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors backdrop-blur-sm border border-white/20"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Volver
+        </button>
+        <PiFlyGame />
       </div>
     );
   }

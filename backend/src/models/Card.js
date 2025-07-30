@@ -1,6 +1,18 @@
 const mongoose = require('mongoose');
 
 const cardSchema = new mongoose.Schema({
+  cardNumber: {
+    type: String,
+    required: [true, 'Card number is required'],
+    unique: true,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        return /^\d{3}$/.test(v); // Debe ser exactamente 3 dígitos
+      },
+      message: 'Card number must be exactly 3 digits (e.g., "001", "042")'
+    }
+  },
   name: {
     type: String,
     required: [true, 'Card name is required'],

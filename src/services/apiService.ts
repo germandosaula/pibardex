@@ -136,6 +136,15 @@ class ApiService {
     return this.post(API_ENDPOINTS.USERS.ADD_EXPERIENCE, { amount });
   }
 
+  // Skin methods
+  async buySkin(skinId: string, cost: number) {
+    return this.post(API_ENDPOINTS.USERS.BUY_SKIN, { skinId, cost });
+  }
+
+  async selectSkin(skinId: string) {
+    return this.post(API_ENDPOINTS.USERS.SELECT_SKIN, { skinId });
+  }
+
   // Card methods
   async getCardCatalog() {
     return this.get(API_ENDPOINTS.CARDS.CATALOG);
@@ -157,6 +166,10 @@ class ApiService {
     return this.put(API_ENDPOINTS.CARDS.MARK_SEEN, { cardIds });
   }
 
+  async upgradeCard(cardId: string) {
+    return this.post(API_ENDPOINTS.CARDS.UPGRADE_CARD(cardId));
+  }
+
   // Game methods
   async startGame(gameType: string, difficulty?: string) {
     return this.post(API_ENDPOINTS.GAMES.START, { gameType, difficulty });
@@ -172,6 +185,12 @@ class ApiService {
 
   async getGameStats() {
     return this.get(API_ENDPOINTS.GAMES.STATS);
+  }
+
+  // Admin methods
+  async adminLogin(credentials: { email: string; password: string }) {
+    const response = await this.post<{ token?: string; admin: any }>(API_ENDPOINTS.ADMIN.LOGIN, credentials);
+    return response;
   }
 
   // Health check

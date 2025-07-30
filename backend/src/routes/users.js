@@ -50,4 +50,14 @@ router.post('/coins/spend', validateCoinOperation, handleValidationErrors, userC
 // Experience operations
 router.post('/experience/add', validateExperienceOperation, handleValidationErrors, userController.addExperience);
 
+// Skin routes
+router.post('/skins/buy', [
+  body('skinId').notEmpty().withMessage('Skin ID is required'),
+  body('cost').isInt({ min: 1 }).withMessage('Cost must be a positive integer')
+], handleValidationErrors, userController.buySkin);
+
+router.post('/skins/select', [
+  body('skinId').notEmpty().withMessage('Skin ID is required')
+], handleValidationErrors, userController.selectSkin);
+
 module.exports = router;

@@ -180,11 +180,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       if (!state.user) return;
       
       // Actualizar en el backend
-      await apiService.post('/users/coins/add', { amount });
+      const response = await apiService.addCoins(amount, 'Game reward') as any;
       
-      // Actualizar localmente
-      const newAmount = state.user.coins + amount;
-      dispatch({ type: 'UPDATE_COINS', payload: newAmount });
+      // Actualizar localmente con la respuesta del backend
+      if (response.newBalance !== undefined) {
+        dispatch({ type: 'UPDATE_COINS', payload: response.newBalance });
+      } else {
+        // Fallback: actualizar localmente
+        const newAmount = state.user.coins + amount;
+        dispatch({ type: 'UPDATE_COINS', payload: newAmount });
+      }
     } catch (error) {
       console.error('Error adding coins:', error);
       // Recargar datos del usuario en caso de error
@@ -200,11 +205,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       }
       
       // Actualizar en el backend
-      await apiService.post('/users/coins/spend', { amount });
+      const response = await apiService.spendCoins(amount, 'Store purchase') as any;
       
-      // Actualizar localmente
-      const newAmount = state.user.coins - amount;
-      dispatch({ type: 'UPDATE_COINS', payload: newAmount });
+      // Actualizar localmente con la respuesta del backend
+      if (response.newBalance !== undefined) {
+        dispatch({ type: 'UPDATE_COINS', payload: response.newBalance });
+      } else {
+        // Fallback: actualizar localmente
+        const newAmount = state.user.coins - amount;
+        dispatch({ type: 'UPDATE_COINS', payload: newAmount });
+      }
       
       return true;
     } catch (error) {

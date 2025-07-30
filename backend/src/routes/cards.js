@@ -47,5 +47,6 @@ router.post('/open-pack', validatePackOpening, handleValidationErrors, cardContr
 // Card management
 router.put('/:cardId/favorite', cardController.toggleFavorite);
 router.post('/mark-seen', validateMarkAsSeen, handleValidationErrors, cardController.markCardsAsSeen);
+router.post('/:cardId/upgrade', cardController.upgradeCard);
 
 module.exports = router;

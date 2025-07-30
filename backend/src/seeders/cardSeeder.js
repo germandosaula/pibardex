@@ -5,6 +5,7 @@ require('dotenv').config();
 const sampleCards = [
   // Common Cards
   {
+    cardNumber: "001",
     name: "Pikachu Básico",
     description: "Un Pokémon eléctrico pequeño pero poderoso",
     image: "/cards/pikachu-basic.png",
@@ -18,6 +19,7 @@ const sampleCards = [
     dropRate: 25
   },
   {
+    cardNumber: "002",
     name: "Charmander",
     description: "Un Pokémon de fuego con gran potencial",
     image: "/cards/charmander.png",
@@ -31,6 +33,7 @@ const sampleCards = [
     dropRate: 25
   },
   {
+    cardNumber: "003",
     name: "Squirtle",
     description: "Un Pokémon de agua defensivo",
     image: "/cards/squirtle.png",
@@ -44,6 +47,7 @@ const sampleCards = [
     dropRate: 25
   },
   {
+    cardNumber: "004",
     name: "Bulbasaur",
     description: "Un Pokémon planta con habilidades curativas",
     image: "/cards/bulbasaur.png",
@@ -57,6 +61,7 @@ const sampleCards = [
     dropRate: 25
   },
   {
+    cardNumber: "005",
     name: "Poción",
     description: "Restaura 20 puntos de salud",
     image: "/cards/potion.png",
@@ -72,6 +77,7 @@ const sampleCards = [
 
   // Rare Cards
   {
+    cardNumber: "006",
     name: "Raichu",
     description: "La evolución de Pikachu con poder eléctrico intenso",
     image: "/cards/raichu.png",
@@ -86,6 +92,7 @@ const sampleCards = [
     dropRate: 15
   },
   {
+    cardNumber: "007",
     name: "Charizard",
     description: "Un dragón de fuego legendario",
     image: "/cards/charizard.png",
@@ -100,6 +107,7 @@ const sampleCards = [
     dropRate: 12
   },
   {
+    cardNumber: "008",
     name: "Blastoise",
     description: "Una tortuga de agua con cañones poderosos",
     image: "/cards/blastoise.png",
@@ -114,6 +122,7 @@ const sampleCards = [
     dropRate: 12
   },
   {
+    cardNumber: "009",
     name: "Venusaur",
     description: "Una planta gigante con poderes naturales",
     image: "/cards/venusaur.png",
@@ -130,6 +139,7 @@ const sampleCards = [
 
   // Epic Cards
   {
+    cardNumber: "010",
     name: "Mewtwo",
     description: "Un Pokémon psíquico creado artificialmente",
     image: "/cards/mewtwo.png",
@@ -145,6 +155,7 @@ const sampleCards = [
     dropRate: 8
   },
   {
+    cardNumber: "011",
     name: "Mew",
     description: "El Pokémon ancestral con todos los genes",
     image: "/cards/mew.png",
@@ -159,6 +170,7 @@ const sampleCards = [
     dropRate: 6
   },
   {
+    cardNumber: "012",
     name: "Dragonite",
     description: "Un dragón benévolo con increíble poder",
     image: "/cards/dragonite.png",
@@ -175,6 +187,7 @@ const sampleCards = [
 
   // Legendary Cards
   {
+    cardNumber: "013",
     name: "Arceus",
     description: "El Pokémon creador del universo",
     image: "/cards/arceus.png",
@@ -190,6 +203,7 @@ const sampleCards = [
     dropRate: 2
   },
   {
+    cardNumber: "014",
     name: "Rayquaza",
     description: "El dragón del cielo que controla el clima",
     image: "/cards/rayquaza.png",
@@ -206,6 +220,7 @@ const sampleCards = [
 
   // Location Cards
   {
+    cardNumber: "015",
     name: "Centro Pokémon",
     description: "Lugar de curación y descanso",
     image: "/cards/pokemon-center.png",
@@ -219,6 +234,7 @@ const sampleCards = [
     dropRate: 15
   },
   {
+    cardNumber: "016",
     name: "Monte Plateado",
     description: "Una montaña mística llena de poder",
     image: "/cards/silver-mountain.png",
@@ -234,6 +250,7 @@ const sampleCards = [
 
   // Spell Cards
   {
+    cardNumber: "017",
     name: "Superpoción",
     description: "Poción mejorada que restaura más salud",
     image: "/cards/super-potion.png",
@@ -247,6 +264,7 @@ const sampleCards = [
     dropRate: 12
   },
   {
+    cardNumber: "018",
     name: "Revivir",
     description: "Revive a un Pokémon debilitado",
     image: "/cards/revive.png",

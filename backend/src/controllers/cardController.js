@@ -34,8 +34,17 @@ const getAllCards = async (req, res) => {
 
     const totalCards = await Card.countDocuments(filter);
 
+    // Map cards to include imageUrl field for frontend compatibility
+    const mappedCards = cards.map(card => ({
+      ...card.toObject(),
+      imageUrl: card.image,
+      power: card.stats?.attack,
+      health: card.stats?.health,
+      cost: card.stats?.mana
+    }));
+
     res.json({
-      cards,
+      cards: mappedCards,
       pagination: {
         currentPage: parseInt(page),
         totalPages: Math.ceil(totalCards / limit),
@@ -66,6 +75,8 @@ const getUserCards = async (req, res) => {
       isNew 
     } = req.query;
 
+    const { generateUpgradedCardData } = require('../utils/cardUpgradeHelper');
+
     // Build filter object
     const filter = { userId: req.userId };
     
@@ -88,10 +99,31 @@ const getUserCards = async (req, res) => {
     // Filter out null cardId (when populate doesn't match)
     const validUserCards = userCards.filter(uc => uc.cardId);
 
+    // Map user cards to include imageUrl field and upgrade data when applicable
+    const mappedUserCards = validUserCards.map(userCard => {
+      let cardData = userCard.cardId.toObject();
+      
+      // If user has upgraded this card, generate upgraded data
+      if (userCard.isUpgraded && userCard.upgradeLevel > 0) {
+        cardData = generateUpgradedCardData(cardData, userCard.upgradeLevel);
+      }
+
+      return {
+        ...userCard.toObject(),
+        cardId: {
+          ...cardData,
+          imageUrl: cardData.image,
+          power: cardData.stats?.attack,
+          health: cardData.stats?.health,
+          cost: cardData.stats?.mana
+        }
+      };
+    });
+
     const totalUserCards = await UserCard.countDocuments(filter);
 
     res.json({
-      userCards: validUserCards,
+      userCards: mappedUserCards,
       pagination: {
         currentPage: parseInt(page),
         totalPages: Math.ceil(totalUserCards / limit),
@@ -115,12 +147,39 @@ const openPack = async (req, res) => {
   try {
     const { packType = 'booster' } = req.body;
     
-    // Pack costs and card counts
+    // Pack costs and card counts with specific rarity guarantees
     const packConfig = {
-      starter: { cost: 50, cardCount: 3 },
-      booster: { cost: 100, cardCount: 5 },
-      premium: { cost: 250, cardCount: 8 },
-      special: { cost: 500, cardCount: 10 }
+      starter: { 
+        cost: 50, 
+        cardCount: 2,
+        rarityDistribution: [
+          { rarity: 'common', count: 2 }
+        ]
+      },
+      booster: { 
+        cost: 100, 
+        cardCount: 3,
+        rarityDistribution: [
+          { rarity: 'common', count: 2 },
+          { rarity: 'rare', count: 1 }
+        ]
+      },
+      premium: { 
+        cost: 200, 
+        cardCount: 3,
+        rarityDistribution: [
+          { rarity: 'common', count: 2 },
+          { rarity: 'epic', count: 1 }
+        ]
+      },
+      special: { 
+        cost: 350, 
+        cardCount: 3,
+        rarityDistribution: [
+          { rarity: 'common', count: 2 },
+          { rarity: 'special', count: 1 } // Special means epic or legendary with low chance
+        ]
+      }
     };
 
     const config = packConfig[packType];
@@ -158,43 +217,34 @@ const openPack = async (req, res) => {
       });
     }
 
-    // Generate random cards based on rarity weights
-    const rarityWeights = {
-      common: 60,
-      rare: 25,
-      epic: 12,
-      legendary: 3
-    };
-
     const obtainedCards = [];
     
-    for (let i = 0; i < config.cardCount; i++) {
-      // Determine rarity based on weights
-      const random = Math.random() * 100;
-      let selectedRarity = 'common';
-      let cumulativeWeight = 0;
-      
-      for (const [rarity, weight] of Object.entries(rarityWeights)) {
-        cumulativeWeight += weight;
-        if (random <= cumulativeWeight) {
-          selectedRarity = rarity;
-          break;
+    // Generate cards based on specific rarity distribution
+    for (const rarityConfig of config.rarityDistribution) {
+      for (let i = 0; i < rarityConfig.count; i++) {
+        let selectedRarity = rarityConfig.rarity;
+        
+        // Special handling for 'special' rarity (epic or legendary)
+        if (selectedRarity === 'special') {
+          // 15% chance for legendary, 85% chance for epic
+          const random = Math.random();
+          selectedRarity = random < 0.15 ? 'legendary' : 'epic';
         }
-      }
 
-      // Get cards of selected rarity
-      const cardsOfRarity = availableCards.filter(card => card.rarity === selectedRarity);
-      
-      if (cardsOfRarity.length === 0) {
-        // Fallback to common if no cards of selected rarity
-        const commonCards = availableCards.filter(card => card.rarity === 'common');
-        if (commonCards.length > 0) {
-          const randomCard = commonCards[Math.floor(Math.random() * commonCards.length)];
+        // Get cards of selected rarity
+        const cardsOfRarity = availableCards.filter(card => card.rarity === selectedRarity);
+        
+        if (cardsOfRarity.length === 0) {
+          // Fallback to common if no cards of selected rarity
+          const commonCards = availableCards.filter(card => card.rarity === 'common');
+          if (commonCards.length > 0) {
+            const randomCard = commonCards[Math.floor(Math.random() * commonCards.length)];
+            obtainedCards.push(randomCard);
+          }
+        } else {
+          const randomCard = cardsOfRarity[Math.floor(Math.random() * cardsOfRarity.length)];
           obtainedCards.push(randomCard);
         }
-      } else {
-        const randomCard = cardsOfRarity[Math.floor(Math.random() * cardsOfRarity.length)];
-        obtainedCards.push(randomCard);
       }
     }
 
@@ -214,6 +264,8 @@ const openPack = async (req, res) => {
           existingUserCard.quantity += 1;
           existingUserCard.isNew = true;
           await existingUserCard.save();
+          // Populate cardId for consistency
+          await existingUserCard.populate('cardId');
           newUserCards.push(existingUserCard);
         } else {
           // Create new user card
@@ -237,11 +289,31 @@ const openPack = async (req, res) => {
     user.stats.cardsCollected += obtainedCards.length;
     await user.addExperience(config.cardCount * 10); // 10 XP per card
 
+    // Map cards to include imageUrl field for frontend compatibility
+    const mappedCards = newUserCards.map(userCard => {
+      // Ensure cardId is populated
+      if (!userCard.cardId || typeof userCard.cardId === 'string') {
+        console.error('UserCard cardId not properly populated:', userCard);
+        return null;
+      }
+
+      return {
+        ...userCard.toObject(),
+        cardId: {
+          ...(userCard.cardId.toObject ? userCard.cardId.toObject() : userCard.cardId),
+          imageUrl: userCard.cardId.image,
+          power: userCard.cardId.stats?.attack,
+          health: userCard.cardId.stats?.health,
+          cost: userCard.cardId.stats?.mana
+        }
+      };
+    }).filter(card => card !== null); // Remove any null entries
+
     res.json({
       message: 'Pack opened successfully',
       packType,
       cost: config.cost,
-      cards: newUserCards,
+      cards: mappedCards,
       newBalance: user.coins,
       experienceGained: config.cardCount * 10
     });
@@ -321,10 +393,124 @@ const markCardsAsSeen = async (req, res) => {
   }
 };
 
+// Upgrade card using duplicates - Marks UserCard as upgraded without modifying original card
+const upgradeCard = async (req, res) => {
+  try {
+    const { cardId } = req.params;
+    const { generateUpgradedCardData, getUpgradeRequirements, canCardBeUpgraded } = require('../utils/cardUpgradeHelper');
+    
+    // Validate cardId
+    console.log('Upgrade card request - cardId:', cardId, 'type:', typeof cardId);
+    
+    if (!cardId || cardId === 'undefined' || cardId === 'null') {
+      return res.status(400).json({
+        message: 'Valid card ID is required',
+        received: cardId
+      });
+    }
+    
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      });
+    }
+
+    // First, find the card by cardNumber to get its _id
+    const foundCard = await Card.findOne({ cardNumber: cardId });
+    if (!foundCard) {
+      return res.status(404).json({
+        message: 'Card not found',
+        cardNumber: cardId
+      });
+    }
+
+    // Find the user's card using the actual card _id
+    const userCard = await UserCard.findOne({
+      userId: req.userId,
+      cardId: foundCard._id
+    }).populate('cardId');
+
+    if (!userCard) {
+      return res.status(404).json({
+        message: 'Card not found in user collection'
+      });
+    }
+
+    const card = userCard.cardId;
+    
+    // Check if card is already upgraded
+    if (userCard.isUpgraded) {
+      return res.status(400).json({
+        message: 'This card is already upgraded to Holo version'
+      });
+    }
+    
+    // Check if card can be upgraded
+    if (!canCardBeUpgraded(card.rarity)) {
+      return res.status(400).json({
+        message: 'This card cannot be upgraded'
+      });
+    }
+
+    // Get upgrade requirements
+    const upgradeConfig = getUpgradeRequirements(card.rarity);
+    if (!upgradeConfig) {
+      return res.status(400).json({
+        message: 'This card cannot be upgraded'
+      });
+    }
+
+    // Check if user has enough duplicates
+    if (userCard.quantity < upgradeConfig.required) {
+      return res.status(400).json({
+        message: `You need ${upgradeConfig.required} copies of this card to upgrade it. You have ${userCard.quantity}.`,
+        required: upgradeConfig.required,
+        current: userCard.quantity
+      });
+    }
+
+    // Consume the required cards
+    const newQuantity = userCard.quantity - upgradeConfig.required;
+    
+    // Mark the UserCard as upgraded
+    userCard.isUpgraded = true;
+    userCard.upgradeLevel = 1;
+    userCard.upgradedAt = new Date();
+    userCard.quantity = newQuantity > 0 ? newQuantity : 1; // Keep at least 1 for the upgraded version
+    userCard.isNew = true; // Mark as new to show the upgrade
+    await userCard.save();
+
+    // Add experience and update stats
+    await user.addExperience(upgradeConfig.experience);
+    user.stats.cardsUpgraded = (user.stats.cardsUpgraded || 0) + 1;
+    await user.save();
+
+    // Generate upgraded card data for response
+    const upgradedCardData = generateUpgradedCardData(card.toObject(), userCard.upgradeLevel);
+
+    res.json({
+      message: `Card upgraded successfully to Holo version!`,
+      upgradedCard: upgradedCardData,
+      experienceGained: upgradeConfig.experience,
+      remainingQuantity: userCard.quantity,
+      upgradeLevel: userCard.upgradeLevel
+    });
+
+  } catch (error) {
+    console.error('Upgrade card error:', error);
+    res.status(500).json({
+      message: 'Error upgrading card',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllCards,
   getUserCards,
   openPack,
   toggleFavorite,
-  markCardsAsSeen
+  markCardsAsSeen,
+  upgradeCard
 };

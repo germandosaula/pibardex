@@ -7,7 +7,10 @@ import { useUser } from '../../contexts/UserContext';
 
 export const Navigation: React.FC = () => {
   const { state } = useUser();
-  const { user, coins, experience, level, isAuthenticated } = state;
+  const { user, isAuthenticated } = state;
+  const coins = user?.coins || 0;
+  const experience = user?.experience || 0;
+  const level = user?.level || 1;
   const navItems = [
     { icon: Home, label: 'Inicio', color: 'from-blue-400 to-blue-600' },
     { icon: Gamepad2, label: 'Juegos', color: 'from-purple-400 to-purple-600' },

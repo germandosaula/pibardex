@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const gameRoutes = require('./routes/games');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -26,7 +27,9 @@ app.use(limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL || 'http://localhost:5173'
+    : true, // Permitir cualquier origen en desarrollo
   credentials: true
 }));
 
@@ -42,6 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/cards', cardRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -68,10 +72,28 @@ app.use('*', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on 0.0.0.0:${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV}`);
   console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL}`);
+  console.log(`💻 Local URL: http://localhost:${PORT}`);
+  console.log(`🌍 Network URL: http://${getLocalIp()}:${PORT}`);
 });
+
+// Función para obtener la IP local
+function getLocalIp() {
+  const { networkInterfaces } = require('os');
+  const nets = networkInterfaces();
+  
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      // Omitir direcciones de interfaz interna y no IPv4
+      if (!net.internal && net.family === 'IPv4') {
+        return net.address;
+      }
+    }
+  }
+  return '0.0.0.0';
+}
 
 module.exports = app;

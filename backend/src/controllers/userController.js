@@ -200,23 +200,119 @@ const addExperience = async (req, res) => {
     }
 
     const oldLevel = user.level;
+    const oldCoins = user.coins;
+    
     await user.addExperience(amount);
-    const newLevel = user.level;
-
+    
+    const leveledUp = user.level > oldLevel;
+    const coinsEarned = user.coins - oldCoins;
+    
     res.json({
-      message: `${amount} experience added successfully`,
-      experienceGained: amount,
-      newExperience: user.experience,
-      levelUp: newLevel > oldLevel,
-      oldLevel,
-      newLevel,
-      expProgress: user.getExpForNextLevel()
+      success: true,
+      message: 'Experience added successfully',
+      data: {
+        experience: user.experience,
+        level: user.level,
+        coins: user.coins,
+        leveledUp,
+        coinsEarned
+      }
     });
-
   } catch (error) {
-    console.error('Add experience error:', error);
+    console.error('Error adding experience:', error);
     res.status(500).json({
       message: 'Error adding experience',
+      error: error.message
+    });
+  }
+};
+
+// Buy skin
+const buySkin = async (req, res) => {
+  try {
+    const { skinId, cost } = req.body;
+    
+    if (!skinId || !cost || cost <= 0) {
+      return res.status(400).json({
+        message: 'Skin ID and cost are required'
+      });
+    }
+
+    const user = await User.findById(req.userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      });
+    }
+
+    // Check if user already has the skin
+    if (user.unlockedSkins.includes(skinId)) {
+      return res.status(400).json({
+        message: 'Skin already owned'
+      });
+    }
+
+    // Check if user has enough coins
+    if (user.coins < cost) {
+      return res.status(400).json({
+        message: 'Insufficient coins'
+      });
+    }
+
+    // Spend coins and add skin
+    await user.spendCoins(cost);
+    await user.addSkin(skinId);
+    
+    res.json({
+      success: true,
+      message: 'Skin purchased successfully',
+      data: {
+        unlockedSkins: user.unlockedSkins,
+        coins: user.coins
+      }
+    });
+  } catch (error) {
+    console.error('Error buying skin:', error);
+    res.status(500).json({
+      message: 'Error buying skin',
+      error: error.message
+    });
+  }
+};
+
+// Select skin
+const selectSkin = async (req, res) => {
+  try {
+    const { skinId } = req.body;
+    
+    if (!skinId) {
+      return res.status(400).json({
+        message: 'Skin ID is required'
+      });
+    }
+
+    const user = await User.findById(req.userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      });
+    }
+
+    await user.selectSkin(skinId);
+    
+    res.json({
+      success: true,
+      message: 'Skin selected successfully',
+      data: {
+        selectedSkin: user.selectedSkin
+      }
+    });
+  } catch (error) {
+    console.error('Error selecting skin:', error);
+    res.status(500).json({
+      message: 'Error selecting skin',
       error: error.message
     });
   }
@@ -227,5 +323,7 @@ module.exports = {
   getLeaderboard,
   addCoins,
   spendCoins,
-  addExperience
+  addExperience,
+  buySkin,
+  selectSkin
 };

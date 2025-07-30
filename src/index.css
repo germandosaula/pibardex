@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -101,4 +103,337 @@ body {
 
 .card-glow-red {
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Estilos para PiFly - Estilo Pokémon */
+.pokemon-font {
+  font-family: 'Fredoka One', 'Nunito', cursive;
+}
+
+.pokemon-text {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+
+.pifly-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.pifly-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.game-panel {
+  background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
+  border: 4px solid #4a5568;
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.game-panel::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+  border-radius: 22px;
+  z-index: -1;
+}
+
+.pokemon-button {
+  background: linear-gradient(145deg, #4299e1, #3182ce);
+  border: 3px solid #2b6cb0;
+  border-radius: 15px;
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pokemon-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.pokemon-button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.pokemon-button.purple {
+  background: linear-gradient(145deg, #9f7aea, #805ad5);
+  border-color: #6b46c1;
+}
+
+.pokemon-button.green {
+  background: linear-gradient(145deg, #48bb78, #38a169);
+  border-color: #2f855a;
+}
+
+.pokemon-button.yellow {
+  background: linear-gradient(145deg, #ed8936, #dd6b20);
+  border-color: #c05621;
+}
+
+.stats-panel {
+  background: linear-gradient(145deg, #1a202c, #2d3748);
+  border: 2px solid #4a5568;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-left: 4px solid #4299e1;
+}
+
+.bonus-indicator {
+  background: linear-gradient(45deg, #f6ad55, #ed8936);
+  border: 2px solid #dd6b20;
+  border-radius: 20px;
+  padding: 4px 12px;
+  color: white;
+  font-weight: 800;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(237, 137, 54, 0.3);
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 8px rgba(237, 137, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 12px rgba(237, 137, 54, 0.5);
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: linear-gradient(145deg, #2d3748, #1a202c);
+  border: 4px solid #4a5568;
+  border-radius: 25px;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+  border-radius: 27px;
+  z-index: -1;
+}
+
+.skin-card {
+  background: linear-gradient(145deg, #4a5568, #2d3748);
+  border: 3px solid #718096;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.skin-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.6s ease;
+  z-index: 1;
+}
+
+.skin-card:hover::before {
+  left: 100%;
+}
+
+.skin-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: #a0aec0;
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.skin-card.selected {
+  border-color: #48bb78;
+  background: linear-gradient(145deg, #38a169, #2f855a);
+  box-shadow: 
+    0 12px 24px rgba(72, 187, 120, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.skin-card.legendary {
+  border-color: #f6ad55;
+  background: linear-gradient(145deg, #ed8936, #dd6b20);
+}
+
+.skin-card.legendary:hover {
+  border-color: #fbd38d;
+  box-shadow: 
+    0 15px 30px rgba(246, 173, 85, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.skin-card.epic {
+  border-color: #9f7aea;
+  background: linear-gradient(145deg, #805ad5, #6b46c1);
+}
+
+.skin-card.epic:hover {
+  border-color: #b794f6;
+  box-shadow: 
+    0 15px 30px rgba(159, 122, 234, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.skin-card.rare {
+  border-color: #4299e1;
+  background: linear-gradient(145deg, #3182ce, #2b6cb0);
+}
+
+.skin-card.rare:hover {
+  border-color: #63b3ed;
+  box-shadow: 
+    0 15px 30px rgba(66, 153, 225, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.rarity-badge {
+  background: linear-gradient(45deg, #f6ad55, #ed8936);
+  border: 2px solid #dd6b20;
+  border-radius: 15px;
+  padding: 6px 12px;
+  color: white;
+  font-weight: 800;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(237, 137, 54, 0.3);
+  display: inline-block;
+}
+
+.rarity-badge.legendary {
+  background: linear-gradient(45deg, #f6ad55, #ed8936);
+  border-color: #dd6b20;
+  animation: legendary-glow 2s infinite;
+}
+
+@keyframes legendary-glow {
+  0%, 100% {
+    box-shadow: 0 4px 8px rgba(237, 137, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 12px rgba(237, 137, 54, 0.6);
+  }
+}
+
+.pokemon-button.red {
+  background: linear-gradient(145deg, #e53e3e, #c53030);
+  border-color: #9c2626;
+}
+
+.pokemon-button.gray {
+  background: linear-gradient(145deg, #718096, #4a5568);
+  border-color: #2d3748;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.pokemon-button.blue {
+  background: linear-gradient(145deg, #4299e1, #3182ce);
+  border-color: #2b6cb0;
+}
+
+.instruction-text {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }

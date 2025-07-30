@@ -53,6 +53,14 @@ const userSchema = new mongoose.Schema({
     description: String,
     unlockedAt: { type: Date, default: Date.now }
   }],
+  unlockedSkins: [{
+    type: String,
+    default: []
+  }],
+  selectedSkin: {
+    type: String,
+    default: 'default'
+  },
   lastLogin: {
     type: Date,
     default: Date.now
@@ -154,6 +162,23 @@ userSchema.methods.getExpForNextLevel = function() {
     needed: expForNextLevel,
     percentage: Math.floor((expInCurrentLevel / expForNextLevel) * 100)
   };
+};
+
+// Add skin method
+userSchema.methods.addSkin = function(skinId) {
+  if (!this.unlockedSkins.includes(skinId)) {
+    this.unlockedSkins.push(skinId);
+  }
+  return this.save();
+};
+
+// Select skin method
+userSchema.methods.selectSkin = function(skinId) {
+  if (this.unlockedSkins.includes(skinId) || skinId === 'default') {
+    this.selectedSkin = skinId;
+    return this.save();
+  }
+  throw new Error('Skin not unlocked');
 };
 
 module.exports = mongoose.model('User', userSchema);

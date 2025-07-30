@@ -2,6 +2,7 @@ export type CardRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 export interface Card {
   id: string;
+  cardNumber?: string;
   name: string;
   description: string;
   imageUrl: string;
@@ -10,6 +11,19 @@ export interface Card {
   power?: number;
   health?: number;
   cost?: number;
+  isUpgraded?: boolean;
+  upgradeLevel?: number;
+  stats?: {
+    attack: number;
+    defense: number;
+    health: number;
+    mana: number;
+  };
+  abilities?: Array<{
+    name: string;
+    description: string;
+    cost: number;
+  }>;
 }
 
 export interface UserCard {

@@ -6,6 +6,8 @@ export interface User {
   experience: number;
   level: number;
   selectedCharacter: string;
+  unlockedSkins: string[];
+  selectedSkin: string;
   createdAt: Date;
   updatedAt: Date;
 }
